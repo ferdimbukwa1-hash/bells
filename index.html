@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Excellence | Belinda Amanya</title>
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@300;700;900&family=Playfair+Display:ital,wght@0,700;1,700&display=swap');
+
+        :root {
+            --gold: #d4af37;
+            --deep-purple: #1a0033;
+            --accent-pink: #ff3366;
+            --glass: rgba(255, 255, 255, 0.05);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            background-color: #050505;
+            color: #fff;
+            font-family: 'Montserrat', sans-serif;
+            height: 100vh;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        #fireworks-canvas {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        /* Sophisticated UI Container */
+        .stage {
+            position: relative;
+            z-index: 10;
+            width: 90%;
+            max-width: 600px;
+            padding: 50px;
+            background: var(--glass);
+            backdrop-filter: blur(25px);
+            -webkit-backdrop-filter: blur(25px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 40px;
+            text-align: center;
+            box-shadow: 0 40px 100px rgba(0,0,0,0.8);
+            transition: all 1s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Advanced Photo Displays */
+        .photo-frame {
+            position: relative;
+            width: 220px;
+            height: 220px;
+            margin: 0 auto 30px;
+            display: none;
+        }
+
+        .img-main {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 30px;
+            border: 2px solid var(--gold);
+            box-shadow: 0 0 40px rgba(212, 175, 55, 0.3);
+            animation: float 6s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-15px) rotate(2deg); }
+        }
+
+        h1 {
+            font-family: 'Playfair Display', serif;
+            font-size: 2.5rem;
+            margin-bottom: 20px;
+            letter-spacing: 2px;
+            background: linear-gradient(to right, #fff, var(--gold));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .countdown-text {
+            font-size: 8rem;
+            font-weight: 900;
+            line-height: 1;
+            margin: 20px 0;
+            text-shadow: 0 0 30px var(--accent-pink);
+        }
+
+        input {
+            background: rgba(255,255,255,0.05);
+            border: 1px solid rgba(255,255,255,0.2);
+            padding: 18px;
+            border-radius: 15px;
+            color: white;
+            width: 100%;
+            margin-bottom: 20px;
+            font-size: 1.1rem;
+            outline: none;
+            transition: 0.3s;
+        }
+
+        input:focus { border-color: var(--gold); background: rgba(255,255,255,0.1); }
+
+        .btn-action {
+            background: linear-gradient(45deg, var(--gold), #f9e29b);
+            color: #000;
+            border: none;
+            padding: 20px 40px;
+            border-radius: 50px;
+            font-weight: 900;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            cursor: pointer;
+            width: 100%;
+            transition: 0.4s;
+        }
+
+        .btn-action:hover {
+            transform: scale(1.02) translateY(-3px);
+            box-shadow: 0 15px 30px rgba(212, 175, 55, 0.4);
+        }
+
+        .status-msg {
+            margin-top: 25px;
+            font-size: 0.8rem;
+            text-transform: uppercase;
+            color: var(--gold);
+            letter-spacing: 3px;
+            opacity: 0.7;
+        }
+
+        .hidden { display: none !important; opacity: 0; }
+
+        /* Multi-Display background elements */
+        .bg-img-small {
+            position: absolute;
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            opacity: 0.2;
+            z-index: -1;
+            filter: grayscale(100%);
+            animation: spin 20s linear infinite;
+        }
+
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+
+    <canvas id="fireworks-canvas"></canvas>
+
+    <div class="stage" id="main-stage">
+        <div id="auth-section">
+            <h1>Identity Required</h1>
+            <p style="margin-bottom:30px; opacity:0.6;">Enter the passcode for Belinda Amanya</p>
+            <input type="password" id="pass-input" placeholder="ACCESS CODE">
+            <button class="btn-action" onclick="validate()">Initiate Sequence</button>
+        </div>
+
+        <div id="celebration-section" class="hidden">
+            <div class="photo-frame" id="hero-frame">
+                <img src="WhatsApp Image 2026-01-20 at 12.24.38 AM.jpeg" class="img-main">
+            </div>
+            <h1 id="celebration-title">Awaiting Command</h1>
+            <div id="main-timer" class="countdown-text"></div>
+            <button class="btn-action" id="start-btn" onclick="startBirthdayEngine()">Launch Celebration</button>
+            <div id="engine-status" class="status-msg">SYSTEMS READY</div>
+        </div>
+    </div>
+
+    <audio id="audio-track" src="Ada_Ehi_feat._Buchi_-_Congratulations_(mp3.pm).mp3"></audio>
+
+    <script>
+        const audio = document.getElementById('audio-track');
+        const canvas = document.getElementById('fireworks-canvas');
+        const ctx = canvas.getContext('2d');
+        const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+
+        let particles = [];
+
+        // Synthesizer for high-quality beeps
+        function playBeep(frequency, duration) {
+            const osc = audioCtx.createOscillator();
+            const gain = audioCtx.createGain();
+            osc.connect(gain);
+            gain.connect(audioCtx.destination);
+            osc.frequency.value = frequency;
+            osc.type = 'sine';
+            gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+            gain.gain.exponentialRampToValueAtTime(0.0001, audioCtx.currentTime + duration);
+            osc.start();
+            osc.stop(audioCtx.currentTime + duration);
+        }
+
+        function validate() {
+            const pw = document.getElementById('pass-input').value;
+            if (pw.toLowerCase() === 'amanya') {
+                document.getElementById('auth-section').classList.add('hidden');
+                document.getElementById('celebration-section').classList.remove('hidden');
+            }
+        }
+
+        async function startBirthdayEngine() {
+            if (audioCtx.state === 'suspended') await audioCtx.resume();
+            
+            const btn = document.getElementById('start-btn');
+            const timer = document.getElementById('main-timer');
+            const title = document.getElementById('celebration-title');
+            const frame = document.getElementById('hero-frame');
+            const status = document.getElementById('engine-status');
+
+            btn.classList.add('hidden');
+            frame.style.display = 'block';
+            title.innerText = "Synchronizing";
+
+            let count = 5;
+            const countdownInterval = setInterval(() => {
+                if (count > 0) {
+                    timer.innerText = count;
+                    playBeep(880, 0.4); // High beep
+                } else if (count === 0) {
+                    playBeep(1760, 0.8); // Final burst beep
+                    timer.innerText = "GO";
+                    title.innerText = "HAPPY BIRTHDAY BELINDA!";
+                    status.innerText = "PLAYING: CONGRATULATIONS - ADA EHI";
+                    clearInterval(countdownInterval);
+                    triggerCelebration();
+                }
+                count--;
+            }, 1000);
+        }
+
+        function triggerCelebration() {
+            audio.play();
+            startFireworks();
+
+            // SENSITIVE SHUTDOWN TRIGGER: Only fires when the file actually ends
+            audio.onended = () => {
+                document.getElementById('engine-status').innerText = "TRACK COMPLETE | SHUTDOWN IMMINENT";
+                initiateFinalShutdown();
+            };
+        }
+
+        function initiateFinalShutdown() {
+            let timeLeft = 15;
+            const timer = document.getElementById('main-timer');
+            const stage = document.getElementById('main-stage');
+
+            const shutdownTimer = setInterval(() => {
+                timer.style.fontSize = "4rem";
+                timer.innerText = `OFF: ${timeLeft}s`;
+                
+                if (timeLeft <= 0) {
+                    clearInterval(shutdownTimer);
+                    stage.style.opacity = "0";
+                    stage.style.transform = "scale(0.8)";
+                    setTimeout(() => {
+                        document.body.innerHTML = "<h1 style='color:white; text-align:center;'>Access Revoked. See you next year.</h1>";
+                    }, 1500);
+                }
+                timeLeft--;
+            }, 1000);
+        }
+
+        // --- Sophisticated Particle Engine ---
+        class Particle {
+            constructor(x, y, color) {
+                this.x = x; this.y = y; this.color = color;
+                this.velocity = {
+                    x: (Math.random() - 0.5) * 12,
+                    y: (Math.random() - 0.5) * 12
+                };
+                this.alpha = 1;
+                this.friction = 0.96;
+                this.gravity = 0.15;
+            }
+            draw() {
+                ctx.save();
+                ctx.globalAlpha = this.alpha;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, 2, 0, Math.PI * 2);
+                ctx.fillStyle = this.color;
+                ctx.shadowBlur = 10;
+                ctx.shadowColor = this.color;
+                ctx.fill();
+                ctx.restore();
+            }
+            update() {
+                this.velocity.x *= this.friction;
+                this.velocity.y *= this.friction;
+                this.velocity.y += this.gravity;
+                this.x += this.velocity.x;
+                this.y += this.velocity.y;
+                this.alpha -= 0.01;
+            }
+        }
+
+        function createFirework() {
+            const x = Math.random() * canvas.width;
+            const y = Math.random() * (canvas.height / 2);
+            const color = `hsl(${Math.random() * 360}, 80%, 60%)`;
+            for (let i = 0; i < 60; i++) particles.push(new Particle(x, y, color));
+        }
+
+        function startFireworks() {
+            function animate() {
+                ctx.fillStyle = 'rgba(5, 5, 5, 0.2)';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                
+                if (Math.random() < 0.05) createFirework();
+                
+                particles.forEach((p, i) => {
+                    if (p.alpha > 0) {
+                        p.update();
+                        p.draw();
+                    } else {
+                        particles.splice(i, 1);
+                    }
+                });
+                requestAnimationFrame(animate);
+            }
+            animate();
+        }
+
+        window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        });
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+    </script>
+</body>
+</html>
